@@ -1,0 +1,247 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1) | Hexo</title><meta name="author" content="0xLeo"><meta name="copyright" content="0xLeo"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1. Basic DefinitionAn elliptic curve is defined by the equation: 1y² &#x3D; x³ + ax + b  Where constants a and b must satisfy 4a³ + 27b² ≠ 0 to ensure the curve has no singularities. Typical elliptic curve">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)">
+<meta property="og:url" content="http://example.com/2025/04/21/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1. Basic DefinitionAn elliptic curve is defined by the equation: 1y² &#x3D; x³ + ax + b  Where constants a and b must satisfy 4a³ + 27b² ≠ 0 to ensure the curve has no singularities. Typical elliptic curve">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/butterfly-icon.png">
+<meta property="article:published_time" content="2025-04-22T03:51:55.000Z">
+<meta property="article:modified_time" content="2025-04-22T13:43:57.467Z">
+<meta property="article:author" content="0xLeo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/butterfly-icon.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)",
+  "url": "http://example.com/2025/04/21/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-1/",
+  "image": "http://example.com/img/butterfly-icon.png",
+  "datePublished": "2025-04-22T03:51:55.000Z",
+  "dateModified": "2025-04-22T13:43:57.467Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "0xLeo",
+      "url": "http://example.com/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/04/21/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Failed',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Hexo</span></a><a class="nav-page-title" href="/"><span class="site-name">Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)</span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2025-04-22T03:51:55.000Z" title="Created 2025-04-21 20:51:55">2025-04-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2025-04-22T13:43:57.467Z" title="Updated 2025-04-22 06:43:57">2025-04-22</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="1-Basic-Definition"><a href="#1-Basic-Definition" class="headerlink" title="1. Basic Definition"></a>1. Basic Definition</h2><p>An elliptic curve is defined by the equation:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y² = x³ + ax + b</span><br></pre></td></tr></table></figure>
+
+<p>Where constants a and b must satisfy 4a³ + 27b² ≠ 0 to ensure the curve has no singularities.</p>
+<p>Typical elliptic curves look like these👇</p>
+<img src="./01.png" width="50%" alt="Elliptic curve visualization">
+
+
+
+<h2 id="2-Key-Operations-on-Elliptic-Curves"><a href="#2-Key-Operations-on-Elliptic-Curves" class="headerlink" title="2. Key Operations on Elliptic Curves"></a>2. Key Operations on Elliptic Curves</h2><h3 id="2-1-Point-Addition"><a href="#2-1-Point-Addition" class="headerlink" title="2.1 Point Addition"></a>2.1 Point Addition</h3><p>When we add two distinct points P and Q on an elliptic curve, we get a third point P + Q also on the curve.</p>
+<img src="./02.png" width="25%" alt="Elliptic curve visualization">
+
+<p><strong>Geometric Process:</strong></p>
+<ol>
+<li>Draw a line through points P and Q</li>
+<li>Find where this line intersects the curve at a third point</li>
+<li>Reflect this intersection point across the x-axis to get P + Q</li>
+</ol>
+<p><strong>Algebraic Formula:</strong> If P &#x3D; (x₁, y₁) and Q &#x3D; (x₂, y₂), then P + Q &#x3D; (x₃, y₃) where:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">λ = (y₂ - y₁)/(x₂ - x₁)</span><br><span class="line">x₃ = λ² - x₁ - x₂</span><br><span class="line">y₃ = λ(x₁ - x₃) - y₁</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Point-Doubling"><a href="#2-2-Point-Doubling" class="headerlink" title="2.2 Point Doubling"></a>2.2 Point Doubling</h3><p>When we add a point to itself (P + P &#x3D; 2P), we use the tangent line at point P.</p>
+<img src="./03.png" width="25%" alt="Elliptic curve visualization">
+
+<p><strong>Geometric Process:</strong></p>
+<ol>
+<li>Draw the tangent line at point P</li>
+<li>Find where this tangent intersects the curve</li>
+<li>Reflect this intersection point across the x-axis</li>
+</ol>
+<p><strong>Algebraic Formula:</strong> If P &#x3D; (x₁, y₁), then 2P &#x3D; (x₃, y₃) where:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">λ = (3x₁² + a)/(2y₁)</span><br><span class="line">x₃ = λ² - 2x₁</span><br><span class="line">y₃ = λ(x₁ - x₃) - y₁</span><br></pre></td></tr></table></figure>
+
+<details>
+  <summary><font size="4" color="orange">Show Mathematics</font></summary>
+  <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; font-family: 'Times New Roman', serif;">
+    <p style="font-size: 16px; line-height: 1.5;">The tangent line at a point on an elliptic curve is calculated using differential calculus.</p>
+    <p style="font-size: 16px; line-height: 1.5;">For an elliptic curve with equation <span style="font-style: italic; color: #2c3e50;">y² = x³ + ax + b</span>, to find the tangent at point P = (x₁, y₁):</p>
+    <ol style="margin-left: 20px;">
+      <li>Treat the curve equation as an implicit function <span style="font-weight: bold;">F(x,y) = y² - x³ - ax - b = 0</span></li>
+      <li>Apply the implicit function differentiation formula: <span style="color: #e74c3c;">dy/dx = -∂F/∂x ÷ ∂F/∂y</span></li>
+    </ol>
+    <p style="font-size: 16px; line-height: 1.5;">Computing the partial derivatives:</p>
+    <div style="margin-left: 30px; margin-bottom: 10px;">
+      <p style="margin: 5px 0;">∂F/∂x = -3x² - a</p>
+      <p style="margin: 5px 0;">∂F/∂y = 2y</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.5;">Therefore, the slope of the tangent line is:</p>
+    <div style="background-color: #eaf2f8; padding: 10px; border-radius: 5px; text-align: center;">
+      <p style="margin: 5px 0; font-weight: bold;">λ = dy/dx = (-(-3x² - a)) ÷ 2y = (3x² + a) ÷ 2y</p>
+    </div>
+    <p style="font-size: 16px; line-height: 1.5;">For point P = (x₁, y₁), the tangent slope is:</p>
+    <div style="background-color: #eaf2f8; padding: 10px; border-radius: 5px; text-align: center;">
+      <p style="margin: 5px 0; font-weight: bold;">λ = (3x₁² + a) ÷ 2y₁</p>
+    </div>
+    <p style="margin-top: 15px;">This is the formula used in your code for point doubling. This slope determines where the tangent line intersects the curve at a third point, which is then reflected across the x-axis to obtain 2P.</p>
+  </div>
+</details>
+
+<h3 id="2-3-Scalar-multiplication"><a href="#2-3-Scalar-multiplication" class="headerlink" title="2.3 Scalar multiplication"></a>2.3 Scalar multiplication</h3><p>Scalar multiplication computes kP (P added to itself k times) for a point P and an integer k.</p>
+<p><strong>Example:</strong></p>
+<ul>
+<li>3P &#x3D; P + P + P &#x3D; P + 2P</li>
+<li>4P &#x3D; 2P + 2P</li>
+<li>5P &#x3D; 4P + P</li>
+</ul>
+<p>For efficiency, we use the “double-and-add” algorithm, which works by scanning the binary representation of k:</p>
+<p>In binary representation, if we have k &#x3D; (bₙ₋₁…b₁b₀)₂, then:</p>
+<p>kP &#x3D; b₀·P + b₁·2P + b₂·2²P + … + bₙ₋₁·2ⁿ⁻¹P</p>
+<p>This formula means: if the scalar k is expressed as a binary number, then the scalar multiplication kP can be represented as a combination of different powers of P (P, 2P, 4P, 8P…), where each term is included only if the corresponding bit in the binary representation of k is 1.</p>
+<p>This reduces the number of operations to O(log k), making it much more efficient.</p>
+<h2 id="4-Elliptic-Curves-over-Finite-Fields"><a href="#4-Elliptic-Curves-over-Finite-Fields" class="headerlink" title="4. Elliptic Curves over Finite Fields"></a>4. Elliptic Curves over Finite Fields</h2><p>In cryptography, we use elliptic curves over finite fields, typically prime fields GF(p). The equation becomes:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y² ≡ x³ + ax + b (mod p)</span><br></pre></td></tr></table></figure>
+
+<p>All coordinates and calculations are performed modulo p, creating a finite set of discrete points.</p>
+<h2 id="5-The-Discrete-Logarithm-Problem"><a href="#5-The-Discrete-Logarithm-Problem" class="headerlink" title="5. The Discrete Logarithm Problem"></a>5. The Discrete Logarithm Problem</h2><p>The security of elliptic curve cryptography is based on the hardness of the Elliptic Curve Discrete Logarithm Problem (ECDLP):</p>
+<p><strong>Problem statement:</strong> Given points P and Q on an elliptic curve where Q &#x3D; kP, find the scalar k.</p>
+<h3 id="5-1-Why-is-it-difficult"><a href="#5-1-Why-is-it-difficult" class="headerlink" title="5.1 Why is it difficult?"></a>5.1 Why is it difficult?</h3><p>While computing Q &#x3D; kP (scalar multiplication) is relatively straightforward, the reverse problem is computationally infeasible for well-chosen curves with large parameters because:</p>
+<ol>
+<li><strong>No Direct Inverse Operation:</strong> There’s no “division” operation that can efficiently compute k given P and kP.</li>
+<li><strong>Discrete Nature:</strong> Unlike continuous functions, the relationship between inputs and outputs doesn’t follow a smooth pattern that can be analyzed mathematically.</li>
+<li><strong>Large Search Space:</strong> For a curve with order n (approximately the size of the field p), there are about n possible values for k. With 256-bit curves, this means approximately 2²⁵⁶ possibilities.</li>
+<li><strong>No Known Shortcuts:</strong> The best algorithms for solving ECDLP (like Pollard’s rho) still require approximately √n operations, which is still exponential in the bit length of n.</li>
+</ol>
+<h3 id="6-A-Simple-Rust-Implementation"><a href="#6-A-Simple-Rust-Implementation" class="headerlink" title="6. A Simple Rust Implementation."></a>6. A Simple Rust Implementation.</h3><figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#[derive(Clone, Copy, PartialEq, Debug)]</span></span><br><span class="line"><span class="keyword">enum</span> <span class="title class_">Point</span> &#123;</span><br><span class="line">    Infinity,</span><br><span class="line">    Affine &#123; x: <span class="type">f64</span>, y: <span class="type">f64</span> &#125;,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">EllipticCurve</span> &#123;</span><br><span class="line">    a: <span class="type">f64</span>,</span><br><span class="line">    b: <span class="type">f64</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">impl</span> <span class="title class_">EllipticCurve</span> &#123;</span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">new</span>(a: <span class="type">f64</span>, b: <span class="type">f64</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;</span><br><span class="line">        <span class="comment">// Check that 4a³ + 27b² ≠ 0 to ensure no singularities</span></span><br><span class="line">        <span class="built_in">assert_ne!</span>(<span class="number">4.0</span> * a.<span class="title function_ invoke__">powi</span>(<span class="number">3</span>) + <span class="number">27.0</span> * b.<span class="title function_ invoke__">powi</span>(<span class="number">2</span>), <span class="number">0.0</span>);</span><br><span class="line">        EllipticCurve &#123; a, b &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">add_points</span>(&amp;<span class="keyword">self</span>, p: Point, q: Point) <span class="punctuation">-&gt;</span> Point &#123;</span><br><span class="line">        <span class="keyword">match</span> (p, q) &#123;</span><br><span class="line">            (Point::Infinity, _) =&gt; q,</span><br><span class="line">            (_, Point::Infinity) =&gt; p,</span><br><span class="line">            (Point::Affine &#123; x: x1, y: y1 &#125;, Point::Affine &#123; x: x2, y: y2 &#125;) =&gt; &#123;</span><br><span class="line">                <span class="comment">// Handle the case where P = -Q</span></span><br><span class="line">                <span class="keyword">if</span> x1 == x2 &amp;&amp; y1 == -y2 &#123;</span><br><span class="line">                    <span class="keyword">return</span> Point::Infinity;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">let</span> <span class="variable">lambda</span> = <span class="keyword">if</span> x1 == x2 &amp;&amp; y1 == y2 &#123;</span><br><span class="line">                    <span class="comment">// Point doubling</span></span><br><span class="line">                    (<span class="number">3.0</span> * x1.<span class="title function_ invoke__">powi</span>(<span class="number">2</span>) + <span class="keyword">self</span>.a) / (<span class="number">2.0</span> * y1)</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// Point addition</span></span><br><span class="line">                    (y2 - y1) / (x2 - x1)</span><br><span class="line">                &#125;;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">let</span> <span class="variable">x3</span> = lambda.<span class="title function_ invoke__">powi</span>(<span class="number">2</span>) - x1 - x2;</span><br><span class="line">                <span class="keyword">let</span> <span class="variable">y3</span> = lambda * (x1 - x3) - y1;</span><br><span class="line"></span><br><span class="line">                Point::Affine &#123; x: x3, y: y3 &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">fn</span> <span class="title function_">double_point</span>(&amp;<span class="keyword">self</span>, p: Point) <span class="punctuation">-&gt;</span> Point &#123;</span><br><span class="line">        <span class="keyword">self</span>.<span class="title function_ invoke__">add_points</span>(p, p)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">scalar_multiply</span>(k: <span class="type">u64</span>, point: Point, curve: &amp;EllipticCurve) <span class="punctuation">-&gt;</span> Point &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">result</span> = Point::Infinity;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">temp_point</span> = point;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">temp_k</span> = k;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> temp_k &gt; <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> temp_k &amp; <span class="number">1</span> == <span class="number">1</span> &#123;</span><br><span class="line">            result = curve.<span class="title function_ invoke__">add_points</span>(result, temp_point);</span><br><span class="line">        &#125;</span><br><span class="line">        temp_point = curve.<span class="title function_ invoke__">double_point</span>(temp_point);</span><br><span class="line">        temp_k &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    result</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;</span><br><span class="line">    <span class="comment">// Example usage</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">curve</span> = EllipticCurve::<span class="title function_ invoke__">new</span>(<span class="number">2.0</span>, <span class="number">1.0</span>); <span class="comment">// y² = x³ + 2x + 1</span></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">point</span> = Point::Affine &#123; x: <span class="number">1.0</span>, y: <span class="number">2.0</span> &#125;; <span class="comment">// A point on the curve</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> <span class="variable">result</span> = <span class="title function_ invoke__">scalar_multiply</span>(<span class="number">5</span>, point, &amp;curve);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">&quot;5P = &#123;:?&#125;&quot;</span>, result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">0xLeo</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2025/04/21/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-1/">http://example.com/2025/04/21/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles on this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless otherwise stated.</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/butterfly-icon.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/04/22/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-2/" title="Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 2)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">Next</div><div class="info-item-2">Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 2)</div></div><div class="info-2"><div class="info-item-1">1. Review of Part 1In the previous article, we explored the fundamentals of elliptic curves and their mathematical properties:  The basic definition of elliptic curves: y² &#x3D; x³ + ax + b Core operations including point addition and point doubling The double-and-add algorithm for efficient scalar multiplication Elliptic curves over finite fields for cryptographic applications The Elliptic Curve Discrete Logarithm Problem (ECDLP) that forms the security foundation  These concepts serve as...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/butterfly-icon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">0xLeo</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Basic-Definition"><span class="toc-number">1.</span> <span class="toc-text">1. Basic Definition</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Key-Operations-on-Elliptic-Curves"><span class="toc-number">2.</span> <span class="toc-text">2. Key Operations on Elliptic Curves</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-Point-Addition"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 Point Addition</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Point-Doubling"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 Point Doubling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-Scalar-multiplication"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 Scalar multiplication</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Elliptic-Curves-over-Finite-Fields"><span class="toc-number">3.</span> <span class="toc-text">4. Elliptic Curves over Finite Fields</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-The-Discrete-Logarithm-Problem"><span class="toc-number">4.</span> <span class="toc-text">5. The Discrete Logarithm Problem</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Why-is-it-difficult"><span class="toc-number">4.1.</span> <span class="toc-text">5.1 Why is it difficult?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-A-Simple-Rust-Implementation"><span class="toc-number">4.2.</span> <span class="toc-text">6. A Simple Rust Implementation.</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Posts</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/22/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-2/" title="Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 2)">Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 2)</a><time datetime="2025-04-23T05:05:23.000Z" title="Created 2025-04-22 22:05:23">2025-04-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/21/Understanding-ECDSA-From-Elliptic-Curves-to-Digital-Signatures-Part-1/" title="Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)">Understanding ECDSA: From Elliptic Curves to Digital Signatures(Part 1)</a><time datetime="2025-04-22T03:51:55.000Z" title="Created 2025-04-21 20:51:55">2025-04-21</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By 0xLeo</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Reading Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light and Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle Between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Settings"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back to Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
